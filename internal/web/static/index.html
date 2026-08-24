@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TraceGuard Enterprise — eBPF Zero-Code Microservice Observability, Distributed Tracing & Correlation Gateway">
+  <title>TraceGuard Enterprise — eBPF Telemetry & Correlation Gateway</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="main-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-title">TraceGuard</h1>
+          <span class="brand-subtitle">ENTERPRISE eBPF</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" id="nav-dashboard-btn" data-tab="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>Live Dashboard</span>
+        </button>
+        <button class="nav-item" id="nav-traces-btn" data-tab="traces">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <span>Distributed Traces</span>
+        </button>
+        <button class="nav-item" id="nav-topology-btn" data-tab="topology">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span>Service Topology</span>
+        </button>
+        <button class="nav-item" id="nav-settings-btn" data-tab="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Engine Status</span>
+        </button>
+      </nav>
+
+      <div class="engine-badge-box">
+        <div class="status-indicator live-pulse" id="engine-status-indicator"></div>
+        <div class="engine-info">
+          <span class="engine-label">ACTIVE ENGINE</span>
+          <span class="engine-name" id="active-engine-name">UNIVERSAL PACKET ENGINE</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="main-content-area">
+      <!-- Topbar Header -->
+      <header class="topbar" id="app-topbar">
+        <div class="topbar-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="global-search-input" placeholder="Search TraceID, Correlation ID, SQL, or Endpoint...">
+        </div>
+
+        <div class="topbar-actions">
+          <div class="live-pill" id="live-stream-badge">
+            <span class="pill-dot"></span> LIVE FEED
+          </div>
+          <button class="btn btn-secondary" id="pause-stream-btn">Pause Stream</button>
+          <button class="btn btn-primary" id="trigger-simulation-btn">+ Simulate Traffic</button>
+        </div>
+      </header>
+
+      <!-- Dashboard View -->
+      <section class="tab-view active" id="view-dashboard">
+        <!-- Stats Summary Grid -->
+        <div class="stats-grid">
+          <div class="stat-card" id="card-spans-total">
+            <div class="stat-header">
+              <span class="stat-title">Captured Spans</span>
+              <div class="stat-icon icon-blue">⚡</div>
+            </div>
+            <div class="stat-value" id="stat-spans-val">0</div>
+            <div class="stat-footer positive">Kernel & socket level capture</div>
+          </div>
+
+          <div class="stat-card" id="card-active-traces">
+            <div class="stat-header">
+              <span class="stat-title">Active Traces</span>
+              <div class="stat-icon icon-purple">🔗</div>
+            </div>
+            <div class="stat-value" id="stat-traces-val">0</div>
+            <div class="stat-footer neutral">Correlated end-to-end trees</div>
+          </div>
+
+          <div class="stat-card" id="card-avg-latency">
+            <div class="stat-header">
+              <span class="stat-title">Avg Request Duration</span>
+              <div class="stat-icon icon-amber">⏱️</div>
+            </div>
+            <div class="stat-value" id="stat-latency-val">0.00 ms</div>
+            <div class="stat-footer neutral">Sub-millisecond resolution</div>
+          </div>
+
+          <div class="stat-card" id="card-error-rate">
+            <div class="stat-header">
+              <span class="stat-title">Total Errors</span>
+              <div class="stat-icon icon-rose">⚠️</div>
+            </div>
+            <div class="stat-value" id="stat-errors-val">0</div>
+            <div class="stat-footer" id="stat-error-footer">0.0% Error Rate</div>
+          </div>
+        </div>
+
+        <!-- Split Grid: Live Stream & Waterfall -->
+        <div class="content-split-grid">
+          <!-- Live Feed Panel -->
+          <div class="panel glass-panel" id="panel-live-traces">
+            <div class="panel-header">
+              <h2 class="panel-title">Real-Time Correlated Spans</h2>
+              <span class="badge" id="traces-count-badge">0 spans</span>
+            </div>
+            <div class="traces-table-container">
+              <table class="data-table" id="table-traces-feed">
+                <thead>
+                  <tr>
+                    <th>Protocol</th>
+                    <th>Service & Endpoint</th>
+                    <th>Correlation ID</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="traces-table-body">
+                  <tr class="empty-row"><td colspan="5">Listening for incoming network packets and eBPF events...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Trace Waterfall Detail Panel -->
+          <div class="panel glass-panel" id="panel-waterfall">
+            <div class="panel-header">
+              <h2 class="panel-title">Trace Waterfall Inspector</h2>
+              <span class="badge badge-accent" id="waterfall-trace-id">Select a Trace</span>
+            </div>
+            <div class="waterfall-container" id="waterfall-tree-container">
+              <div class="waterfall-placeholder">
+                <p>Click on any trace in the table to inspect its full distributed execution tree, span breakdown, and SQL comment metadata.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Distributed Traces View -->
+      <section class="tab-view" id="view-traces">
+        <div class="panel glass-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Full Distributed Trace Registry</h2>
+            <input type="text" class="input-inline" id="traces-filter-input" placeholder="Filter by Service or Correlation ID...">
+          </div>
+          <div class="traces-table-container">
+            <table class="data-table" id="table-traces-full">
+              <thead>
+                <tr>
+                  <th>Trace ID</th>
+                  <th>Correlation ID</th>
+                  <th>Root Service</th>
+                  <th>Span Count</th>
+                  <th>Duration</th>
+                  <th>Errors</th>
+                </tr>
+              </thead>
+              <tbody id="full-traces-body">
+                <tr class="empty-row"><td colspan="6">No registered traces found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Topology View -->
+      <section class="tab-view" id="view-topology">
+        <div class="panel glass-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Live Microservice Dependency Graph</h2>
+            <span class="badge badge-purple">Auto-Discovered</span>
+          </div>
+          <div class="topology-canvas-container" id="topology-graph-container">
+            <div class="topology-nodes-grid" id="topology-nodes-list">
+              <!-- Dynamically populated topology cards -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Engine Status Settings View -->
+      <section class="tab-view" id="view-settings">
+        <div class="panel glass-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">TraceGuard Engine & System Metadata</h2>
+          </div>
+          <div class="settings-grid">
+            <div class="setting-item">
+              <span class="setting-label">Kernel eBPF Status</span>
+              <span class="setting-val text-green" id="setting-ebpf-status">Active / Auto-Detected</span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">OpenTelemetry OTLP Exporter</span>
+              <span class="setting-val" id="setting-otlp-endpoint">localhost:4317 (gRPC)</span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Prometheus Metrics Endpoint</span>
+              <span class="setting-val">/metrics</span>
+            </div>
+            <div class="setting-item">
+              <span class="setting-label">Correlation ID Handlers</span>
+              <span class="setting-val">W3C traceparent, x-correlation-id, SQL comments</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

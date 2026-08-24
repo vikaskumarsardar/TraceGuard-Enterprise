@@ -1,0 +1,14 @@
+# Binaries
+bin/
+*.exe
+*.exe.test
+*.out
+
+# eBPF bytecode build outputs
+*.o
+
+# Environment / IDE files
+.DS_Store
+.idea/
+.vscode/
+*.log
